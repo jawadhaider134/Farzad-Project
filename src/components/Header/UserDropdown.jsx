@@ -31,7 +31,7 @@ export default function UserDropdown({ isLoggedIn, user, setUser, closeMenu, ope
                 setUser(null);
                 localStorage.removeItem("user");
                 closeMenu();
-                window.location.href = "http://localhost:3000/women";
+                window.location.href = "/";
               }}
               className="w-80 bg-black text-white py-2 rounded font-semibold hover:-translate-y-1 
               hover:shadow-[-4px_4px_10px_rgba(0,0,0,0.25)] 
