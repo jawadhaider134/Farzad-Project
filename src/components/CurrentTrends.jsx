@@ -11,40 +11,52 @@ export default function CurrentTrends() {
   const rafRef = useRef(null);
   const location = useLocation();
 
-  // Fetch products dynamically based on current category
   useEffect(() => {
-    const fetchProducts = async () => {
-      let currentPath = location.pathname;
-      let category = "";
-
-      if (currentPath === "/" || currentPath === "/women") category = "women";
-      else if (currentPath === "/men") category = "Men";
-      else if (currentPath === "/kids") category = "kids";
-      else if (currentPath === "/collections") category = ""; // all categories
-
+    const fetchSections = async () => {
       try {
-        const response = await axios.post(
-          "https://tashya-mendez.onrender.com/api/products/filter",
-          { category }
-        );
+        // Check localStorage first
+        const storedSections = localStorage.getItem("sections");
+        let activeSections;
 
-        const products = response.data;
+        if (storedSections) {
+          activeSections = JSON.parse(storedSections);
+        } else {
+          const response = await axios.get(
+            "https://tashya-mendez.onrender.com/api/sections/"
+          );
+          activeSections = response.data.filter((section) => section.is_active);
 
-        // Group products by name for the carousel
-        const grouped = {};
-        products.forEach((prod) => {
-          const key = prod.name.split(".")[0];
-          if (!grouped[key]) grouped[key] = prod;
-        });
+          // Save to localStorage
+          localStorage.setItem("sections", JSON.stringify(activeSections));
+        }
 
-        setTrends(Object.values(grouped));
+        // Determine category based on route
+        const path = location.pathname.toLowerCase();
+        let filteredSections = activeSections;
+
+        if (path === "/men") {
+          filteredSections = activeSections.filter(
+            (section) => section.filter_by.category.toLowerCase() === "men"
+          );
+        } else if (path === "/women") {
+          filteredSections = activeSections.filter(
+            (section) => section.filter_by.category.toLowerCase() === "women"
+          );
+        } else if (path === "/kids") {
+          filteredSections = activeSections.filter(
+            (section) => section.filter_by.category.toLowerCase() === "kids"
+          );
+        }
+        // Else "/" or "/collections" will show all sections
+
+        setTrends(filteredSections);
       } catch (err) {
-        console.error("Failed to fetch products:", err);
+        console.error("Failed to fetch sections:", err);
         setTrends([]);
       }
     };
 
-    fetchProducts();
+    fetchSections();
   }, [location.pathname]);
 
   // Scroll helpers
@@ -148,18 +160,18 @@ export default function CurrentTrends() {
         {trends.map((item) => (
           <Link
             key={item.id}
-            to={`/products/${item.name.split(".")[0]}`}
+            to={`/products/${item.name}`}
             className="min-w-[250px] md:min-w-[300px] rounded-lg overflow-hidden flex-shrink-0 
                        cursor-pointer transition-transform duration-300 block"
           >
             <img
-              src={`https://tashya-mendez.onrender.com/media/${item.name}`}
+              src={item.image}
               alt={item.name}
               className="w-full h-[400px] object-cover"
             />
             <div className="p-3 text-left">
-              <h3 className="font-bold text-lg">{item.name.split(".")[0]}</h3>
-              <p className="text-gray-600">{item.category}</p>
+              <h3 className="font-bold text-lg">{item.name}</h3>
+              <p className="text-gray-600">{item.description}</p>
             </div>
           </Link>
         ))}
