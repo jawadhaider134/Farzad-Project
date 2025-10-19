@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import axios from "axios";
 
@@ -10,11 +10,11 @@ export default function CurrentTrends() {
   const scrollRef = useRef(null);
   const rafRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        // Check localStorage first
         const storedSections = localStorage.getItem("sections");
         let activeSections;
 
@@ -25,12 +25,9 @@ export default function CurrentTrends() {
             "https://tashya-mendez.onrender.com/api/sections/"
           );
           activeSections = response.data.filter((section) => section.is_active);
-
-          // Save to localStorage
           localStorage.setItem("sections", JSON.stringify(activeSections));
         }
 
-        // Determine category based on route
         const path = location.pathname.toLowerCase();
         let filteredSections = activeSections;
 
@@ -47,7 +44,6 @@ export default function CurrentTrends() {
             (section) => section.filter_by.category.toLowerCase() === "kids"
           );
         }
-        // Else "/" or "/collections" will show all sections
 
         setTrends(filteredSections);
       } catch (err) {
@@ -59,7 +55,6 @@ export default function CurrentTrends() {
     fetchSections();
   }, [location.pathname]);
 
-  // Scroll helpers
   const getCardStep = () => {
     const el = scrollRef.current;
     if (!el || !el.firstElementChild) return 0;
@@ -124,6 +119,19 @@ export default function CurrentTrends() {
     setCanScrollRight(target < el.scrollWidth - el.clientWidth - tolerance);
   };
 
+  // Navigate to products page on section click
+  // ... keep everything above unchanged
+
+// Navigate to products page on section click
+const handleSectionClick = (section) => {
+  const { category, tags } = section.filter_by;
+  const tagsParam = tags.join(","); // convert tags array to comma-separated string
+  navigate(`/products/${category.toLowerCase()}?tags=${tagsParam}`);
+};
+
+// ... keep the rest of the code unchanged
+
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-6">
@@ -158,9 +166,9 @@ export default function CurrentTrends() {
         className="flex gap-4 overflow-x-auto no-scrollbar py-2 scroll-smooth"
       >
         {trends.map((item) => (
-          <Link
+          <div
             key={item.id}
-            to={`/products/${item.name}`}
+            onClick={() => handleSectionClick(item)}
             className="min-w-[250px] md:min-w-[300px] rounded-lg overflow-hidden flex-shrink-0 
                        cursor-pointer transition-transform duration-300 block"
           >
@@ -173,7 +181,7 @@ export default function CurrentTrends() {
               <h3 className="font-bold text-lg">{item.name}</h3>
               <p className="text-gray-600">{item.description}</p>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </div>

@@ -13,6 +13,9 @@ import EmptyWishlist from "./pages/EmptyWishList";
 import Cart from "./pages/Cart";
 import Footer from "./components/Footer/Footer";
 import ProductList from "./pages/ProductList";
+import CurrentTrends from "./components/CurrentTrends"
+import FilteredProducts from "./components/FilteredProducts";
+import SectionProducts from "./components/SectionProducts";
 function DefaultLayout({ children }) {
   return (
     <>
@@ -56,15 +59,19 @@ function App() {
             path="/women"
             element={
               <DefaultLayout>
-                <WomenProducts />
+                <CurrentTrends />
               </DefaultLayout>
             }
           />
+          <Route path="/products/:category" element={
+            <AdminLayout>
+              <SectionProducts />
+          </AdminLayout>} />
           <Route
             path="/men"
             element={
               <DefaultLayout>
-                <MenProducts />
+                <CurrentTrends />
               </DefaultLayout>
             }
           />
@@ -72,7 +79,7 @@ function App() {
             path="/kids"
             element={
               <DefaultLayout>
-                <KidsProducts />
+                <CurrentTrends />
               </DefaultLayout>
             }
           />
@@ -80,7 +87,7 @@ function App() {
             path="/collections"
             element={
               <DefaultLayout>
-                <AllCollection />
+                <CurrentTrends />
               </DefaultLayout>
             }
           />

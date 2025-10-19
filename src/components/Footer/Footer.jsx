@@ -1,7 +1,10 @@
 import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube, FaPinterest, FaTiktok } from "react-icons/fa";
 import logo from "../../assets/logo.png"
+import TopBanner from "../Header/TopBanner";
 export default function Footer() {
   return (
+    <>
+    <TopBanner />
     <footer className="bg-white text-gray-800 text-sm border-t border-gray-200">
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
@@ -116,5 +119,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }
