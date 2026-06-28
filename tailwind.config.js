@@ -2,7 +2,6 @@
 module.exports = {
   darkMode: "class",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
-
   theme: {
     extend: {
       container: {
@@ -15,28 +14,52 @@ module.exports = {
         },
       },
 
-      // 🎯 ANIMATIONS
-      animation: {
-        marquee: "marquee 12s linear infinite",
-        fill: "fill 5s linear forwards",
-        shimmer: "shimmer 1.2s ease-in-out infinite",
+      fontFamily: {
+        heading: ["Playfair Display", "serif"],
+        body: ["Source Sans 3", "sans-serif"],
       },
 
-      // 🎯 KEYFRAMES
       keyframes: {
-        marquee: {
-          "0%": { transform: "translateX(0%)" },
-          "100%": { transform: "translateX(-50%)" },
+        slideDown: {
+          "0%": {
+            transform: "translateY(-100%)",
+            opacity: 0,
+          },
+          "100%": {
+            transform: "translateY(0)",
+            opacity: 1,
+          },
         },
-        shimmer: {
-      "0%": { transform: "translateX(-120%)" },
-      "100%": { transform: "translateX(120%)" },
-    },
 
-        fill: {
-          "0%": { width: "0%" },
-          "100%": { width: "100%" },
+        spreadOut: {
+          "0%": {
+            transform: "scale(1)",
+            opacity: 1,
+          },
+          "100%": {
+            transform: "scale(1.2)",
+            opacity: 0,
+          },
         },
+
+        shimmer: {
+          "0%": {
+            backgroundPosition: "-1000px 0",
+          },
+          "100%": {
+            backgroundPosition: "1000px 0",
+          },
+        },
+      },
+
+      animation: {
+        slideDown: "slideDown 0.5s ease-out",
+        spreadOut: "spreadOut 0.5s ease-in forwards",
+        shimmer: "shimmer 1.8s linear infinite",
+      },
+
+      backgroundSize: {
+        shimmer: "1000px 100%",
       },
     },
   },

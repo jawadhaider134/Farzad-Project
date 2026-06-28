@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Loader from "../components/Loader";
-export default function Hero(){
-     const [heroes, setHeroes] = useState([]);
+
+export default function Hero({ onLoginClick }) {
+  const [heroes, setHeroes] = useState([]);
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,7 @@ export default function Hero(){
 
         setHeroes(active);
 
-        // preload images for smooth experience
+        // preload images
         active.forEach((item) => {
           const img = new Image();
           img.src = item.image;
@@ -74,18 +75,14 @@ export default function Hero(){
     );
   };
 
-  if (loading) {
-    return <div className="p-10 text-center">Loading...</div>;
-  }
-
-  if (!heroes.length) {
-    return <div className="p-10 text-center">No hero data found</div>;
-  }
+  // LOADING
+  if (loading) return <Loader />;
+  if (!heroes.length) return <div className="p-10 text-center">No hero data found</div>;
 
   const hero = heroes[index];
-  if (loading) return <Loader />;
-    return (
-         <section className="relative w-full h-[85vh] overflow-hidden">
+
+  return (
+    <section className="relative w-full h-[85vh] overflow-hidden">
 
       {/* BACKGROUND IMAGE */}
       <img
@@ -95,7 +92,7 @@ export default function Hero(){
         className="absolute inset-0 w-full h-full object-cover transition-all duration-700"
       />
 
-      {/* DARK OVERLAY (FIXED FOR READABILITY) */}
+      {/* DARK OVERLAY */}
       <div className="absolute inset-0 bg-black/60"></div>
 
       {/* HERO TEXT */}
@@ -152,5 +149,5 @@ export default function Hero(){
       </div>
 
     </section>
-    )
+  );
 }
