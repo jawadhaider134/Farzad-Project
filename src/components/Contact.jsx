@@ -44,13 +44,6 @@ export default function Contact() {
         message: "",
       });
     } catch (error) {
-  console.log("ERROR:", error);
-
-  if (error.response) {
-    console.log("Status:", error.response.status);
-    console.log("Data:", error.response.data);
-  }
-
   setStatus("error");
 }
     };

@@ -5,7 +5,6 @@ export default function RegisterForm() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [gender, setGender] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -28,7 +27,6 @@ export default function RegisterForm() {
             email,
             password1: password,
             password2: password,
-            gender,
           }),
         }
       );
@@ -43,7 +41,6 @@ export default function RegisterForm() {
         setLastName("");
         setEmail("");
         setPassword("");
-        setGender("");
       } else {
         // Only show one error message at a time
         let firstError = "";
@@ -158,23 +155,6 @@ export default function RegisterForm() {
           >
             Password
           </label>
-        </div>
-
-        {/* Gender */}
-        <div className="col-span-2 flex gap-6 mt-2">
-          {["male", "female", "other"].map((g) => (
-            <label key={g} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="gender"
-                value={g.toLowerCase()}
-                onChange={(e) => setGender(e.target.value)}
-                className="w-5 h-5 border-2 border-black"
-                required
-              />
-              {g}
-            </label>
-          ))}
         </div>
       </div>
 
