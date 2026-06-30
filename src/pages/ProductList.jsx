@@ -27,7 +27,6 @@ export default function ProductList() {
   const [loading, setLoading] = useState(true);
   const [categoryData, setCategoryData] = useState(null);
 
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function fetchData() {
       try {
@@ -71,40 +70,50 @@ export default function ProductList() {
   }, []);
 
   /* ================= TOGGLE FAVORITE ================= */
-  const toggleFavorite = async (product) => {
-    const token = localStorage.getItem("access");
+const toggleFavorite = async (product) => {
+  const token =
+    JSON.parse(localStorage.getItem("user") || "{}")?.access;
 
-    // STEP 1: update local storage always (guest system)
-    const localFavs = JSON.parse(localStorage.getItem("favs") || "{}");
+  // Update localStorage (guest users)
+  const localFavs = JSON.parse(
+    localStorage.getItem("favs") || "{}"
+  );
 
-    localFavs[product.id] = !localFavs[product.id];
-    localStorage.setItem("favs", JSON.stringify(localFavs));
+  localFavs[product.id] = !localFavs[product.id];
 
-    // STEP 2: update UI instantly
-    setFavorites(localFavs);
+  localStorage.setItem(
+    "favs",
+    JSON.stringify(localFavs)
+  );
 
-    // STEP 3: sync with backend if logged in
-    if (token && token !== "undefined") {
-      try {
-        await fetch(
-          "https://tashya-mendez.onrender.com/api/favorites/toggle/",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              product_id: product.id,
-            }),
-          }
-        );
-      } catch (err) {
-        console.error("Sync error:", err);
-      }
+  // Update UI immediately
+  setFavorites({ ...localFavs });
+
+  // Sync with backend if logged in
+  if (token) {
+    try {
+      const response = await fetch(
+        "https://tashya-mendez.onrender.com/api/favorites/toggle/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            product_id: product.id,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Favorite response:", data);
+    } catch (err) {
+      console.error("Favorite sync error:", err);
     }
-  };
-
+  }
+};
   /* ================= LOADING ================= */
   if (loading) {
     return (

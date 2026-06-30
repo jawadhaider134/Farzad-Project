@@ -6,7 +6,8 @@ export default function Wishlist() {
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState(null);
 
-  const token = localStorage.getItem("access");
+  const token =
+    JSON.parse(localStorage.getItem("user") || "{}")?.access;
 
   const getImage = (product) => {
     return (
@@ -28,15 +29,13 @@ export default function Wishlist() {
           localStorage.getItem("favs") || "{}"
         );
 
-        // Get all products
         const productsRes = await fetch(
           "https://tashya-mendez.onrender.com/api/products/"
         );
 
         const allProducts = await productsRes.json();
 
-        // Backend favorites
-        if (token && token !== "undefined") {
+        if (token) {
           const res = await fetch(
             "https://tashya-mendez.onrender.com/api/favorites/",
             {
@@ -51,7 +50,6 @@ export default function Wishlist() {
           }
         }
 
-        // Local favorites -> find real product data
         const localItems = Object.keys(localFavs)
           .filter((id) => localFavs[id])
           .map((id) => {
@@ -67,7 +65,6 @@ export default function Wishlist() {
           })
           .filter((item) => item.product);
 
-        // Merge backend + local
         const merged = [...backendItems];
 
         localItems.forEach((localItem) => {
@@ -91,7 +88,7 @@ export default function Wishlist() {
     };
 
     loadWishlist();
-  }, []);
+  }, [token]);
 
   const removeItem = async (item) => {
     const productId = item.product?.id;
@@ -118,19 +115,14 @@ export default function Wishlist() {
         );
       }, 250);
 
-      if (
-        token &&
-        token !== "undefined" &&
-        !item.isLocal
-      ) {
+      if (token) {
         await fetch(
           "https://tashya-mendez.onrender.com/api/favorites/toggle/",
           {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type":
-                "application/json",
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               product_id: productId,
@@ -141,10 +133,7 @@ export default function Wishlist() {
     } catch (err) {
       console.error(err);
     } finally {
-      setTimeout(
-        () => setRemovingId(null),
-        300
-      );
+      setTimeout(() => setRemovingId(null), 300);
     }
   };
 
@@ -213,4 +202,3 @@ export default function Wishlist() {
     </div>
   );
 }
-

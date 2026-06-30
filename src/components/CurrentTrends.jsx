@@ -1,189 +1,189 @@
-import { useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import axios from "axios";
+// import { useState, useEffect, useRef } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+// import axios from "axios";
 
-export default function CurrentTrends() {
-  const [trends, setTrends] = useState([]);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const scrollRef = useRef(null);
-  const rafRef = useRef(null);
-  const location = useLocation();
-  const navigate = useNavigate();
+// export default function CurrentTrends() {
+//   const [trends, setTrends] = useState([]);
+//   const [canScrollLeft, setCanScrollLeft] = useState(false);
+//   const [canScrollRight, setCanScrollRight] = useState(false);
+//   const scrollRef = useRef(null);
+//   const rafRef = useRef(null);
+//   const location = useLocation();
+//   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchSections = async () => {
-      try {
-        const storedSections = localStorage.getItem("sections");
-        let activeSections;
+//   useEffect(() => {
+//     const fetchSections = async () => {
+//       try {
+//         const storedSections = localStorage.getItem("sections");
+//         let activeSections;
 
-        if (storedSections) {
-          activeSections = JSON.parse(storedSections);
-        } else {
-          const response = await axios.get(
-            "https://tashya-mendez.onrender.com/api/sections/"
-          );
-          activeSections = response.data.filter((section) => section.is_active);
-          localStorage.setItem("sections", JSON.stringify(activeSections));
-        }
+//         if (storedSections) {
+//           activeSections = JSON.parse(storedSections);
+//         } else {
+//           const response = await axios.get(
+//             "https://tashya-mendez.onrender.com/api/sections/"
+//           );
+//           activeSections = response.data.filter((section) => section.is_active);
+//           localStorage.setItem("sections", JSON.stringify(activeSections));
+//         }
 
-        const path = location.pathname.toLowerCase();
-        let filteredSections = activeSections;
+//         const path = location.pathname.toLowerCase();
+//         let filteredSections = activeSections;
 
-        if (path === "/men") {
-          filteredSections = activeSections.filter(
-            (section) => section.filter_by.category.toLowerCase() === "men"
-          );
-        } else if (path === "/women") {
-          filteredSections = activeSections.filter(
-            (section) => section.filter_by.category.toLowerCase() === "women"
-          );
-        } else if (path === "/kids") {
-          filteredSections = activeSections.filter(
-            (section) => section.filter_by.category.toLowerCase() === "kids"
-          );
-        }
+//         if (path === "/men") {
+//           filteredSections = activeSections.filter(
+//             (section) => section.filter_by.category.toLowerCase() === "men"
+//           );
+//         } else if (path === "/women") {
+//           filteredSections = activeSections.filter(
+//             (section) => section.filter_by.category.toLowerCase() === "women"
+//           );
+//         } else if (path === "/kids") {
+//           filteredSections = activeSections.filter(
+//             (section) => section.filter_by.category.toLowerCase() === "kids"
+//           );
+//         }
 
-        setTrends(filteredSections);
-      } catch (err) {
-        console.error("Failed to fetch sections:", err);
-        setTrends([]);
-      }
-    };
+//         setTrends(filteredSections);
+//       } catch (err) {
+//         console.error("Failed to fetch sections:", err);
+//         setTrends([]);
+//       }
+//     };
 
-    fetchSections();
-  }, [location.pathname]);
+//     fetchSections();
+//   }, [location.pathname]);
 
-  const getCardStep = () => {
-    const el = scrollRef.current;
-    if (!el || !el.firstElementChild) return 0;
-    const cardWidth = el.firstElementChild.getBoundingClientRect().width;
-    const style = window.getComputedStyle(el);
-    const gap = parseFloat(style.gap) || 0;
-    return cardWidth + gap;
-  };
+//   const getCardStep = () => {
+//     const el = scrollRef.current;
+//     if (!el || !el.firstElementChild) return 0;
+//     const cardWidth = el.firstElementChild.getBoundingClientRect().width;
+//     const style = window.getComputedStyle(el);
+//     const gap = parseFloat(style.gap) || 0;
+//     return cardWidth + gap;
+//   };
 
-  const checkScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const maxScrollLeft = Math.max(0, el.scrollWidth - el.clientWidth);
-    const tolerance = 2;
-    setCanScrollLeft(el.scrollLeft > tolerance);
-    setCanScrollRight(el.scrollLeft < maxScrollLeft - tolerance);
-  };
+//   const checkScroll = () => {
+//     const el = scrollRef.current;
+//     if (!el) return;
+//     const maxScrollLeft = Math.max(0, el.scrollWidth - el.clientWidth);
+//     const tolerance = 2;
+//     setCanScrollLeft(el.scrollLeft > tolerance);
+//     setCanScrollRight(el.scrollLeft < maxScrollLeft - tolerance);
+//   };
 
-  const handleScroll = () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(checkScroll);
-  };
+//   const handleScroll = () => {
+//     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+//     rafRef.current = requestAnimationFrame(checkScroll);
+//   };
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const initial = setTimeout(checkScroll, 50);
-    el.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-    const imgs = Array.from(el.querySelectorAll("img"));
-    const onImgLoad = () => handleScroll();
-    imgs.forEach((img) => img.addEventListener("load", onImgLoad));
+//   useEffect(() => {
+//     const el = scrollRef.current;
+//     if (!el) return;
+//     const initial = setTimeout(checkScroll, 50);
+//     el.addEventListener("scroll", handleScroll, { passive: true });
+//     window.addEventListener("resize", handleScroll);
+//     const imgs = Array.from(el.querySelectorAll("img"));
+//     const onImgLoad = () => handleScroll();
+//     imgs.forEach((img) => img.addEventListener("load", onImgLoad));
 
-    return () => {
-      clearTimeout(initial);
-      el.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-      imgs.forEach((img) => img.removeEventListener("load", onImgLoad));
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [trends]);
+//     return () => {
+//       clearTimeout(initial);
+//       el.removeEventListener("scroll", handleScroll);
+//       window.removeEventListener("resize", handleScroll);
+//       imgs.forEach((img) => img.removeEventListener("load", onImgLoad));
+//       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+//     };
+//   }, [trends]);
 
-  const scrollNext = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const step = getCardStep() || el.clientWidth;
-    const target = Math.min(el.scrollLeft + step * 4, el.scrollWidth - el.clientWidth);
-    el.scrollTo({ left: target, behavior: "smooth" });
-    const tolerance = 2;
-    setCanScrollLeft(target > tolerance);
-    setCanScrollRight(target < el.scrollWidth - el.clientWidth - tolerance);
-  };
+//   const scrollNext = () => {
+//     const el = scrollRef.current;
+//     if (!el) return;
+//     const step = getCardStep() || el.clientWidth;
+//     const target = Math.min(el.scrollLeft + step * 4, el.scrollWidth - el.clientWidth);
+//     el.scrollTo({ left: target, behavior: "smooth" });
+//     const tolerance = 2;
+//     setCanScrollLeft(target > tolerance);
+//     setCanScrollRight(target < el.scrollWidth - el.clientWidth - tolerance);
+//   };
 
-  const scrollPrev = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const step = getCardStep() || el.clientWidth;
-    const target = Math.max(el.scrollLeft - step * 4, 0);
-    el.scrollTo({ left: target, behavior: "smooth" });
-    const tolerance = 2;
-    setCanScrollLeft(target > tolerance);
-    setCanScrollRight(target < el.scrollWidth - el.clientWidth - tolerance);
-  };
+//   const scrollPrev = () => {
+//     const el = scrollRef.current;
+//     if (!el) return;
+//     const step = getCardStep() || el.clientWidth;
+//     const target = Math.max(el.scrollLeft - step * 4, 0);
+//     el.scrollTo({ left: target, behavior: "smooth" });
+//     const tolerance = 2;
+//     setCanScrollLeft(target > tolerance);
+//     setCanScrollRight(target < el.scrollWidth - el.clientWidth - tolerance);
+//   };
 
-  // Navigate to products page on section click
-  // ... keep everything above unchanged
+//   // Navigate to products page on section click
+//   // ... keep everything above unchanged
 
-// Navigate to products page on section click
-const handleSectionClick = (section) => {
-  const { category, tags } = section.filter_by;
-  const tagsParam = tags.join(","); // convert tags array to comma-separated string
-  navigate(`/products/${category.toLowerCase()}?tags=${tagsParam}`);
-};
+// // Navigate to products page on section click
+// const handleSectionClick = (section) => {
+//   const { category, tags } = section.filter_by;
+//   const tagsParam = tags.join(","); // convert tags array to comma-separated string
+//   navigate(`/products/${category.toLowerCase()}?tags=${tagsParam}`);
+// };
 
-// ... keep the rest of the code unchanged
+// // ... keep the rest of the code unchanged
 
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h4 className="uppercase text-gray-600 font-semibold tracking-wide">
-            Curated by us
-          </h4>
-          <h2 className="text-3xl font-bold">Current trends</h2>
-        </div>
-        <div className="flex">
-          <button
-            onClick={scrollPrev}
-            disabled={!canScrollLeft}
-            className={`p-3 border border-gray-200 rounded-l-full rounded-r-none transition
-              ${!canScrollLeft ? "opacity-40 cursor-default" : "hover:bg-gray-100"}`}
-          >
-            <FaChevronLeft />
-          </button>
-          <button
-            onClick={scrollNext}
-            disabled={!canScrollRight}
-            className={`p-3 border border-gray-200 rounded-r-full rounded-l-none transition
-              ${!canScrollRight ? "opacity-40 cursor-default" : "hover:bg-gray-100"}`}
-          >
-            <FaChevronRight />
-          </button>
-        </div>
-      </div>
+//   return (
+//     <div className="max-w-7xl mx-auto px-4 py-10">
+//       <div className="flex items-center justify-between mb-6">
+//         <div>
+//           <h4 className="uppercase text-gray-600 font-semibold tracking-wide">
+//             Curated by us
+//           </h4>
+//           <h2 className="text-3xl font-bold">Current trends</h2>
+//         </div>
+//         <div className="flex">
+//           <button
+//             onClick={scrollPrev}
+//             disabled={!canScrollLeft}
+//             className={`p-3 border border-gray-200 rounded-l-full rounded-r-none transition
+//               ${!canScrollLeft ? "opacity-40 cursor-default" : "hover:bg-gray-100"}`}
+//           >
+//             <FaChevronLeft />
+//           </button>
+//           <button
+//             onClick={scrollNext}
+//             disabled={!canScrollRight}
+//             className={`p-3 border border-gray-200 rounded-r-full rounded-l-none transition
+//               ${!canScrollRight ? "opacity-40 cursor-default" : "hover:bg-gray-100"}`}
+//           >
+//             <FaChevronRight />
+//           </button>
+//         </div>
+//       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex gap-4 overflow-x-auto no-scrollbar py-2 scroll-smooth"
-      >
-        {trends.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => handleSectionClick(item)}
-            className="min-w-[250px] md:min-w-[300px] rounded-lg overflow-hidden flex-shrink-0 
-                       cursor-pointer transition-transform duration-300 block"
-          >
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full h-[400px] object-cover"
-            />
-            <div className="p-3 text-left">
-              <h3 className="font-bold text-lg">{item.name}</h3>
-              <p className="text-gray-600">{item.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+//       <div
+//         ref={scrollRef}
+//         className="flex gap-4 overflow-x-auto no-scrollbar py-2 scroll-smooth"
+//       >
+//         {trends.map((item) => (
+//           <div
+//             key={item.id}
+//             onClick={() => handleSectionClick(item)}
+//             className="min-w-[250px] md:min-w-[300px] rounded-lg overflow-hidden flex-shrink-0 
+//                        cursor-pointer transition-transform duration-300 block"
+//           >
+//             <img
+//               src={item.image}
+//               alt={item.name}
+//               className="w-full h-[400px] object-cover"
+//             />
+//             <div className="p-3 text-left">
+//               <h3 className="font-bold text-lg">{item.name}</h3>
+//               <p className="text-gray-600">{item.description}</p>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
