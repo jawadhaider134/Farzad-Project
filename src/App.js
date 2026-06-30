@@ -12,6 +12,8 @@ import Footer from "./components/Footer/Footer";
 import ProductList from "./pages/ProductList";
 import About from "./components/About";
 import Contact from "./components/Contact";
+import ResetPassword from "./pages/ResetPassword";
+
 
 // ✅ NEW: Categories Section import
 import CategoriesSection from "./components/CategoriesSection";
@@ -90,6 +92,10 @@ function App() {
               </DefaultLayout>
             }
           />
+          <Route
+  path="/reset-password/:uid/:token"
+  element={<ResetPassword />}
+/>
 
           {/* WISHLIST */}
           <Route
