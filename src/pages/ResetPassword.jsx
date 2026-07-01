@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/auth/password/reset/confirm/";
+const API_URL = "https://tashya-mendez.onrender.com/auth/password/reset/confirm/";
 // Example:
 // https://aboutyou-api.up.railway.app/auth/password/reset/confirm/
 
