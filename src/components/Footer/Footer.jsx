@@ -1,5 +1,5 @@
 import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube, FaPinterest, FaTiktok } from "react-icons/fa";
-import logo from "../../assets/logo.png"
+import logo from "../../assets/footer1.png"
 import TopBanner from "../Header/TopBanner";
 export default function Footer() {
   return (
@@ -13,7 +13,7 @@ export default function Footer() {
               <img
                 src={logo}
                 alt="About You"
-                className="h-40 w-40 relative -top-14 left-0"
+                className="h-36 w-40 relative mb-4 -top-14 left-0 scale-75 rounded-lg"
               />
             </div>
             <div className="flex justify-center md:justify-start space-x-4 text-xl text-gray-700 relative -top-24">

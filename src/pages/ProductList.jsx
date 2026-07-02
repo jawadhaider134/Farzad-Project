@@ -1,22 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaArrowLeft } from "react-icons/fa";
-
-/* ================= HEART ICON ================= */
-const HeartIcon = ({ active }) => {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="w-6 h-6 transition"
-      fill={active ? "#ef4444" : "transparent"}
-      stroke={active ? "#ef4444" : "#000"}
-      strokeWidth="2"
-    >
-      <path d="M12 21s-6.7-4.35-9.33-7.6C-0.1 10.1 2.2 5.7 6.3 5.1 8.4 4.8 10 6 12 8c2-2 3.6-3.2 5.7-2.9 4.1.6 6.4 5 3.63 8.3C18.7 16.65 12 21 12 21z" />
-    </svg>
-  );
-};
+import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
+import { FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 
 export default function ProductList() {
   const { category } = useParams();
@@ -26,7 +13,9 @@ export default function ProductList() {
   const [favorites, setFavorites] = useState({});
   const [loading, setLoading] = useState(true);
   const [categoryData, setCategoryData] = useState(null);
+  const [toast, setToast] = useState("");
 
+  /* ================= FETCH ================= */
   useEffect(() => {
     async function fetchData() {
       try {
@@ -35,21 +24,21 @@ export default function ProductList() {
           axios.get("https://tashya-mendez.onrender.com/api/sections/"),
         ]);
 
-        const cleanedCategory = decodeURIComponent(category)
+        const cleaned = decodeURIComponent(category)
           .trim()
           .toLowerCase();
 
-        const matchedCategory = sectionsRes.data.find(
-          (cat) =>
-            cat.name?.trim().toLowerCase() === cleanedCategory
+        const matched = sectionsRes.data.find(
+          (c) => c.name?.trim().toLowerCase() === cleaned
         );
 
-        setCategoryData(matchedCategory);
+        setCategoryData(matched);
 
-        const filtered = productsRes.data.filter((item) =>
-          String(item.category || "")
-            .trim()
-            .toLowerCase() === cleanedCategory
+        const filtered = productsRes.data.filter(
+          (p) =>
+            String(p.category || "")
+              .trim()
+              .toLowerCase() === cleaned
         );
 
         setProducts(filtered);
@@ -63,37 +52,54 @@ export default function ProductList() {
     fetchData();
   }, [category]);
 
-  /* ================= LOAD LOCAL FAVORITES ================= */
+  /* ================= FAVORITES ================= */
   useEffect(() => {
     const localFavs = JSON.parse(localStorage.getItem("favs") || "{}");
     setFavorites(localFavs);
   }, []);
 
-  /* ================= TOGGLE FAVORITE ================= */
-const toggleFavorite = async (product) => {
-  const token =
-    JSON.parse(localStorage.getItem("user") || "{}")?.access;
+  const toggleFavorite = async (product) => {
+    const token =
+      JSON.parse(localStorage.getItem("user") || "{}")?.access;
 
-  // Update localStorage (guest users)
-  const localFavs = JSON.parse(
-    localStorage.getItem("favs") || "{}"
-  );
+    const localFavs = JSON.parse(localStorage.getItem("favs") || "{}");
 
-  localFavs[product.id] = !localFavs[product.id];
+    localFavs[product.id] = !localFavs[product.id];
 
-  localStorage.setItem(
-    "favs",
-    JSON.stringify(localFavs)
-  );
+    localStorage.setItem("favs", JSON.stringify(localFavs));
+    setFavorites({ ...localFavs });
 
-  // Update UI immediately
-  setFavorites({ ...localFavs });
+    if (token) {
+      try {
+        await fetch(
+          "https://tashya-mendez.onrender.com/api/favorites/toggle/",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              product_id: product.id,
+            }),
+          }
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
 
-  // Sync with backend if logged in
-  if (token) {
+  /* ================= ADD TO CART ================= */
+  const addToCart = async (product) => {
+    const token =
+      JSON.parse(localStorage.getItem("user") || "{}")?.access;
+
+    if (!token) return;
+
     try {
-      const response = await fetch(
-        "https://tashya-mendez.onrender.com/api/favorites/toggle/",
+      await fetch(
+        "https://tashya-mendez.onrender.com/api/carts/add/",
         {
           method: "POST",
           headers: {
@@ -102,27 +108,26 @@ const toggleFavorite = async (product) => {
           },
           body: JSON.stringify({
             product_id: product.id,
+            quantity: 1,
           }),
         }
       );
 
-      const data = await response.json();
-
-      console.log("Favorite response:", data);
+      setToast("Added to cart 🛒");
+      setTimeout(() => setToast(""), 2000);
     } catch (err) {
-      console.error("Favorite sync error:", err);
+      console.error(err);
+      setToast("Failed to add");
+      setTimeout(() => setToast(""), 2000);
     }
-  }
-};
+  };
+
   /* ================= LOADING ================= */
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {Array(8).fill(0).map((_, i) => (
-          <div
-            key={i}
-            className="h-80 rounded-2xl bg-gray-200 animate-pulse"
-          />
+          <div key={i} className="h-80 rounded-2xl bg-gray-200 animate-pulse" />
         ))}
       </div>
     );
@@ -130,6 +135,13 @@ const toggleFavorite = async (product) => {
 
   return (
     <div>
+
+      {/* TOAST */}
+      {toast && (
+        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          {toast}
+        </div>
+      )}
 
       {/* HERO */}
       <div
@@ -150,7 +162,7 @@ const toggleFavorite = async (product) => {
         </button>
 
         <div className="relative z-10">
-          <h1 className="text-5xl font-bold">
+          <h1 className="text-4xl font-bold">
             {categoryData?.name || category}
           </h1>
           <p className="mt-2 text-white/80">
@@ -165,33 +177,48 @@ const toggleFavorite = async (product) => {
         {products.map((product) => (
           <div
             key={product.id}
-            className="relative overflow-hidden rounded-2xl shadow-lg h-80 group"
+            className="relative rounded-2xl shadow-lg overflow-hidden bg-white"
           >
 
             {/* IMAGE */}
             <img
               src={product.sub_images?.[0]?.image}
-              className="w-full h-full object-cover group-hover:scale-110 transition"
+              className="w-full h-64 object-cover"
             />
 
             {/* HEART */}
             <button
               onClick={() => toggleFavorite(product)}
-              className="absolute top-3 right-3"
+              className="absolute top-3 right-3 w-9 h-9 bg-white rounded-full shadow flex items-center justify-center"
             >
-              <HeartIcon active={favorites[product.id]} />
+              {favorites[product.id] ? (
+                <FaHeart className="text-red-500" />
+              ) : (
+                <FiHeart />
+              )}
             </button>
 
-            {/* BOTTOM INFO */}
-            <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
-              <h3 className="text-sm font-semibold">
-                Best selling
-              </h3>
-              <p className="text-lg font-bold">
-                {product.price}$
-              </p>
-            </div>
+            {/* INFO */}
+            <div className="p-4">
 
+              <h3 className="text-sm font-medium text-gray-500">
+                Product
+              </h3>
+
+              <p className="text-lg font-bold mb-2">
+                ${product.price}
+              </p>
+
+              {/* ADD TO CART (ALWAYS VISIBLE) */}
+              <button
+                onClick={() => addToCart(product)}
+                className="w-full bg-black text-white py-2 rounded-lg font-semibold flex items-center justify-center gap-2"
+              >
+                <FaShoppingCart />
+                Add to Cart
+              </button>
+
+            </div>
           </div>
         ))}
 
