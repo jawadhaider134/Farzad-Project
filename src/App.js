@@ -13,6 +13,7 @@ import ProductList from "./pages/ProductList";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
 
 
 // ✅ NEW: Categories Section import
@@ -96,6 +97,7 @@ function App() {
   path="/reset-password/:uid/:token"
   element={<ResetPassword />}
 />
+<Route path="/verify-email/:key" element={<VerifyEmail />} />
 
           {/* WISHLIST */}
           <Route
